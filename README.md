@@ -15,9 +15,14 @@ all based on the excellent [FZF](https://github.com/junegunn/fzf/) searching uti
   parent and `$HOME` directories.
 
 - additional directory changing with new FZF-based `CTRL+g` (goto) functionality,
-  based on an overwritten `cd` command, a new `cdpaths` command and
-  its underlying `.bash_cdpaths` files in current, parent and `$HOME`
-  directories.
+  based on a new `cdpaths` command and its underlying `.bash_cdpaths` files in current,
+  parent and `$HOME` directories.
+
+- improved directory changing with an overwritten `cd` command, using the
+  built-in `pushd` functionality and its forward directory stack plus
+  additional `cd -` (go backward in directory stack) and `cd +` (go
+  forward in directory stack) commands and its underlying additional
+  reverse directory stack.
 
 Usage
 -----
