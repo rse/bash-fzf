@@ -55,11 +55,11 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_epilog () {
         key=$(echo "$1" | sed -e 1q)
         cmd=$(echo "$1" | sed -e 1d)
-        if [ ".$key" = . -a ".$cmd" = . ]; then
+        if [[ $key == "" && $cmd == "" ]]; then
             echo -n "^[[1A"
             history -s
             history -a
-        elif [ ".$key" = .ctrl-e ]; then
+        elif [[ $key == ctrl-e ]]; then
             read -e -p "\$ " -i "$cmd" cmd
             history -s -- $cmd
             history -a
@@ -78,22 +78,22 @@ if [[ $- =~ .*i.* ]]; then
         local files=""
         local dir=$(pwd)
         local homedir=$(cd $HOME && pwd)
-        local homeseen=0
-        while [ ".$dir" != ./ ]; do
-            if [ -f "$dir/$filename" ]; then
-                if [ ".$files" = . ]; then
+        local homeseen="no"
+        while [[ $dir != "/" ]]; do
+            if [[ -f "$dir/$filename" ]]; then
+                if [[ $files == "" ]]; then
                     files="$dir/$filename"
                 else
                     files="$files $dir/$filename"
                 fi
-                if [ ".$dir" = ".$homedir" ]; then
-                    homeseen=1
+                if [[ $dir == $homedir ]]; then
+                    homeseen="yes"
                 fi
             fi
             dir=$(cd $dir/.. && pwd)
         done
-        if [ ".$homeseen" = .0 -a -f "$HOME/$filename" ]; then
-            if [ ".$files" = . ]; then
+        if [[ $homeseen == "no" && -f "$HOME/$filename" ]]; then
+            if [[ $files == "" ]]; then
                 files="$HOME/$filename"
             else
                 files="$files $HOME/$filename"
@@ -138,7 +138,7 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_bookmark () {
         __fzf_prolog
         local files=$(__fzf_config_files $__fzf_bookmark_file)
-        if [ ".$files" != . ]; then
+        if [[ $files != "" ]]; then
             cmd=$(cat $files | LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' | __fzf_fzf '$ ')
             __fzf_epilog "$cmd"
         else
@@ -153,20 +153,21 @@ if [[ $- =~ .*i.* ]]; then
     #   and editing all previously bookmarked commands
     bookmark () {
         local mode="global"
-        if [ ".$1" = .-l ]; then
+        if [[ $1 == "-l" ]]; then
             mode="local"
             shift
         fi
-        local file=$(__fzf_config_files $__fzf_bookmark_file | sed -e 's; .*;;')
-        if [ ".$file" = . ]; then
-            file="$HOME/$__fzf_bookmark_file"
-        fi
-        if [ $mode = "local" ]; then
+        if [[ $mode == "local" ]]; then
             file="$PWD/$__fzf_bookmark_file"
+        else
+            local file=$(__fzf_config_files $__fzf_bookmark_file | sed -e 's; .*;;')
+            if [[ $file == "" ]]; then
+                file="$HOME/$__fzf_bookmark_file"
+            fi
         fi
-        if [ ".$1" = .-e ]; then
+        if [[ $1 == "-e" ]]; then
             ${EDITOR-vi} $file
-        elif [ ".$1" = .-a ]; then
+        elif [[ $1 == "-a" ]]; then
             fc -l -n -1 | sed -e 's;^[	 ]*;;' >>$file
         else
             echo "-bash: bookmark: ERROR: invalid argument" 2>&1
@@ -192,12 +193,12 @@ if [[ $- =~ .*i.* ]]; then
     #   provide command for scanning directory trees
     cdpaths () {
         local mode="global"
-        if [ ".$1" = .-l ]; then
+        if [[ $1 == "-l" ]]; then
             mode="local"
             shift
         fi
         local ignore="${BASH_CDPATHS_IGNORE:-'/\\.'}"
-        if [ $mode = local ]; then
+        if [[ $mode == "local" ]]; then
             rm -f "$PWD/$__fzf_chdir_file"
             find "$PWD" -type d -print 2>/dev/null | \
                 LC_ALL=C egrep -v "$ignore" | \
@@ -225,7 +226,7 @@ if [[ $- =~ .*i.* ]]; then
         local homedir=$(cd $HOME && pwd)
         for cdpathfile in "$@"; do
             local cdpathdir=$(dirname $cdpathfile)
-            if [ ".$cdpathdir" = ".$homedir" ]; then
+            if [[ $cdpathdir == $homedir ]]; then
                 cdpathdir="~"
             fi
             echo "cd $cdpathdir"
@@ -237,7 +238,7 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_chdir () {
         __fzf_prolog
         local files=$(__fzf_config_files $__fzf_chdir_file)
-        if [ ".$files" != . ]; then
+        if [[ $files != "" ]]; then
             cmd=$(__fzf_chdir_expand $files | __fzf_fzf '$ cd ')
             __fzf_epilog "$cmd"
         else
@@ -254,20 +255,20 @@ if [[ $- =~ .*i.* ]]; then
     #   enhance change directory command
     cd () {
         #   change current working directory
-        if [ ".$1" = .- ]; then
+        if [[ $1 == "-" ]]; then
             #   go to previous working directory on forward directory stack
             #   and move this directory onto the reverse directory stack
-            if [ ${#DIRSTACK[*]} -gt 1 ]; then
+            if [[ ${#DIRSTACK[*]} -gt 1 ]]; then
                 DIRSTACKREV[${#DIRSTACKREV[*]}]="${DIRSTACK[0]}"
                 builtin popd >/dev/null
             else
                 echo "-bash: cd: ERROR: no more previous working directories on forward directory stack" 1>&2
                 return 1
             fi
-        elif [ ".$1" = .+ ]; then
+        elif [[ ".$1" == "+" ]]; then
             #   go to previous working directory on reverse directory stack
             #   and move this directory onto the forward directory stack
-            if [ ${#DIRSTACKREV[*]} -gt 0 ]; then
+            if [[ ${#DIRSTACKREV[*]} -gt 0 ]]; then
                 local i=$((${#DIRSTACKREV[*]} - 1))
                 eval "builtin pushd ${DIRSTACKREV[$i]} >/dev/null"
                 unset DIRSTACKREV[$i]
@@ -277,7 +278,7 @@ if [[ $- =~ .*i.* ]]; then
             fi
         else
             #   support a quick "go to home directory" use case
-            if [ $# -eq 0 ]; then
+            if [[ $# -eq 0 ]]; then
                 set -- $HOME
             fi
 
@@ -285,11 +286,11 @@ if [[ $- =~ .*i.* ]]; then
             #   (which implicitly pushed it onto the forward directory stack)
             pushd ${1+"$@"} >/dev/null 2>/dev/null
             result="$?"
-            if [ $result -ne 0 ]; then
+            if [[ $result -ne 0 ]]; then
                 echo "-bash: cd: ERROR: $*: No such directory" 1>&2
             else
                 #   avoid duplicates on forward directory stack
-                if [ "${#DIRSTACK[*]}" -ge 2 -a "${DIRSTACK[0]}" = "${DIRSTACK[1]}" ]; then
+                if [[ "${#DIRSTACK[*]}" -ge 2 && "${DIRSTACK[0]}" = "${DIRSTACK[1]}" ]]; then
                     builtin popd -n >/dev/null
                 fi
 
