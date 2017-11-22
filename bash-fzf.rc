@@ -53,7 +53,7 @@ if [[ $- =~ .*i.* ]]; then
         key=$(echo "$1" | sed -e 1q)
         cmd=$(echo "$1" | sed -e 1d)
         if [[ $key == "" && $cmd == "" ]]; then
-            echo -n "^[[1A"
+            echo -n -e "\e[1A"
             history -s
             history -a
         elif [[ $key == ctrl-e ]]; then
