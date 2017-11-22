@@ -53,8 +53,8 @@ if [[ $- =~ .*i.* ]]; then
 
     #   common fzf(1) processing epilog
     __fzf_epilog () {
-        key=`echo "$1" | sed -e 1q`
-        cmd=`echo "$1" | sed -e 1d`
+        key=$(echo "$1" | sed -e 1q)
+        cmd=$(echo "$1" | sed -e 1d)
         if [ ".$key" = . -a ".$cmd" = . ]; then
             echo -n "^[[1A"
             history -s
@@ -76,8 +76,8 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_config_files () {
         local filename="$1"
         local files=""
-        local dir=`pwd`
-        local homedir=`cd $HOME && pwd`
+        local dir=$(pwd)
+        local homedir=$(cd $HOME && pwd)
         local homeseen=0
         while [ ".$dir" != ./ ]; do
             if [ -f "$dir/$filename" ]; then
@@ -90,7 +90,7 @@ if [[ $- =~ .*i.* ]]; then
                     homeseen=1
                 fi
             fi
-            dir=`cd $dir/..; pwd`
+            dir=$(cd $dir/.. && pwd)
         done
         if [ ".$homeseen" = .0 -a -f "$HOME/$filename" ]; then
             if [ ".$files" = . ]; then
@@ -120,7 +120,7 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_history () {
         __fzf_prolog
         history -a
-        local cmd=`history | LC_ALL=C sort -rn | LC_ALL=C sed -e 1d | LC_ALL=C cut -c29- | __fzf_fzf "\$ "`
+        local cmd=$(history | LC_ALL=C sort -rn | LC_ALL=C sed -e 1d | LC_ALL=C cut -c29- | __fzf_fzf "\$ ")
         __fzf_epilog "$cmd"
     }
 
@@ -137,9 +137,9 @@ if [[ $- =~ .*i.* ]]; then
     #   the additional bookmarking functionality
     __fzf_bookmark () {
         __fzf_prolog
-        local files=`__fzf_config_files $__fzf_bookmark_file`
+        local files=$(__fzf_config_files $__fzf_bookmark_file)
         if [ ".$files" != . ]; then
-            cmd=`cat $files | LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' | __fzf_fzf '$ '`
+            cmd=$(cat $files | LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' | __fzf_fzf '$ ')
             __fzf_epilog "$cmd"
         else
             echo "-bash: bookmark: ERROR: no file \"$__fzf_bookmark_file\" in current, parent(s) or home directory found"
@@ -157,7 +157,7 @@ if [[ $- =~ .*i.* ]]; then
             mode="local"
             shift
         fi
-        local file=`__fzf_config_files $__fzf_bookmark_file | sed -e 's; .*;;'`
+        local file=$(__fzf_config_files $__fzf_bookmark_file | sed -e 's; .*;;')
         if [ ".$file" = . ]; then
             file="$HOME/$__fzf_bookmark_file"
         fi
@@ -202,7 +202,7 @@ if [[ $- =~ .*i.* ]]; then
             find "$PWD" -type d -print 2>/dev/null | \
                 LC_ALL=C egrep -v "$ignore" | \
                 LC_ALL=C sed -e "s;^$PWD/*;;" -e '/^$/d' >"$PWD/$__fzf_chdir_file"
-            n=`wc -l "$PWD/.bash_cdpaths" | awk '{ print $1; }'`
+            n=$(wc -l "$PWD/.bash_cdpaths" | awk '{ print $1; }')
             echo "cached $n directory entries in $PWD/$__fzf_chdir_file"
         else
             rm -f "$HOME/$__fzf_chdir_file"
@@ -215,14 +215,14 @@ if [[ $- =~ .*i.* ]]; then
                     LC_ALL=C sed -e "s;^$HOME/*;;" -e '/^$/d' >>"$HOME/$__fzf_chdir_file"
             done
             IFS="$OIFS"
-            n=`wc -l "$HOME/$__fzf_chdir_file" | awk '{ print $1; }'`
+            n=$(wc -l "$HOME/$__fzf_chdir_file" | awk '{ print $1; }')
             echo "(cached $n directory entries in $HOME/$__fzf_chdir_file)"
         fi
     }
 
     #   expand .bash_cdpaths files content
     __fzf_chdir_expand () {
-        local homedir=`cd $HOME && pwd`
+        local homedir=$(cd $HOME && pwd)
         for cdpathfile in "$@"; do
             local cdpathdir=$(dirname $cdpathfile)
             if [ ".$cdpathdir" = ".$homedir" ]; then
@@ -236,9 +236,9 @@ if [[ $- =~ .*i.* ]]; then
     #   the additional change directory functionality
     __fzf_chdir () {
         __fzf_prolog
-        local files=`__fzf_config_files $__fzf_chdir_file`
+        local files=$(__fzf_config_files $__fzf_chdir_file)
         if [ ".$files" != . ]; then
-            cmd=`__fzf_chdir_expand $files | __fzf_fzf '$ cd '`
+            cmd=$(__fzf_chdir_expand $files | __fzf_fzf '$ cd ')
             __fzf_epilog "$cmd"
         else
             echo "bash: ERROR: no file \"$__fzf_chdir_file\" in current, parent(s) or home directory found"
