@@ -35,14 +35,11 @@ if [[ $- =~ .*i.* ]]; then
 
     #   common fzf(1) execution
     __fzf_fzf () {
-        local prompt="$1"
-        shift
         fzf --exact \
             --no-sort \
             --no-mouse \
             --reverse \
             --height=5 \
-            --prompt="$prompt" \
             --color=bw \
             --no-bold \
             --inline-info \
@@ -120,7 +117,7 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_history () {
         __fzf_prolog
         history -a
-        local cmd=$(history | LC_ALL=C sort -rn | LC_ALL=C sed -e 1d | LC_ALL=C cut -c29- | __fzf_fzf "\$ ")
+        local cmd=$(history | LC_ALL=C sort -rn | LC_ALL=C sed -e 1d | LC_ALL=C cut -c29- | __fzf_fzf --prompt="\$ ")
         __fzf_epilog "$cmd"
     }
 
@@ -139,7 +136,7 @@ if [[ $- =~ .*i.* ]]; then
         __fzf_prolog
         local files=$(__fzf_config_files $__fzf_bookmark_file)
         if [[ $files != "" ]]; then
-            cmd=$(cat $files | LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' | __fzf_fzf '$ ')
+            cmd=$(cat $files | LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' | __fzf_fzf --prompt='$ ')
             __fzf_epilog "$cmd"
         else
             echo "-bash: bookmark: ERROR: no file \"$__fzf_bookmark_file\" in current, parent(s) or home directory found"
@@ -239,7 +236,7 @@ if [[ $- =~ .*i.* ]]; then
         __fzf_prolog
         local files=$(__fzf_config_files $__fzf_chdir_file)
         if [[ $files != "" ]]; then
-            cmd=$(__fzf_chdir_expand $files | __fzf_fzf '$ cd ')
+            cmd=$(__fzf_chdir_expand $files | __fzf_fzf --prompt='$ cd ')
             __fzf_epilog "$cmd"
         else
             echo "bash: ERROR: no file \"$__fzf_chdir_file\" in current, parent(s) or home directory found"
