@@ -239,7 +239,7 @@ if [[ $- =~ .*i.* ]]; then
             cmd=$(__fzf_chdir_expand $files | __fzf_fzf --prompt='$ cd ')
             __fzf_epilog "$cmd"
         else
-            echo "bash: ERROR: no file \"$__fzf_chdir_file\" in current, parent(s) or home directory found"
+            echo "-bash: chdir: ERROR: no file \"$__fzf_chdir_file\" in current, parent(s) or home directory found"
         fi
     }
 
