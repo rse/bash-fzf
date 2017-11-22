@@ -31,10 +31,19 @@ Usage
 source bash-fzf.rc
 ```
 
+History
+-------
+
+The functionality was invented in 1997 and was originally based on
+iselect(1), an interactive selection tool by the author, a little
+bit similar to FZF but without the search functionality. In 2017 the
+functionality was migrated to the excellent FZF utility and the result
+released as Open Source.
+
 License
 -------
 
-Copyright (c) 1991-2017 Ralf S. Engelschall (http://engelschall.com/)
+Copyright (c) 1997-2017 Ralf S. Engelschall (http://engelschall.com/)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
