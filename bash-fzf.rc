@@ -30,7 +30,7 @@ if [[ $- =~ .*i.* ]]; then
 
     #   common fzf(1) processing prolog
     __fzf_prolog () {
-        echo -n "[1A"
+        echo -n -e "\e[1A"
     }
 
     #   common fzf(1) execution
