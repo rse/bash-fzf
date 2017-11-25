@@ -262,7 +262,7 @@ if [[ $- =~ .*i.* ]]; then
                 echo "-bash: cd: ERROR: no more previous working directories on forward directory stack" 1>&2
                 return 1
             fi
-        elif [[ ".$1" == "+" ]]; then
+        elif [[ $1 == "+" ]]; then
             #   go to previous working directory on reverse directory stack
             #   and move this directory onto the forward directory stack
             if [[ ${#DIRSTACKREV[*]} -gt 0 ]]; then
