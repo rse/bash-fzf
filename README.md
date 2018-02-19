@@ -4,6 +4,8 @@ bash-fzf
 
 ### Enhance GNU Bash with FZF Matching
 
+![bash-fzf usage](screenshot.png)
+
 About
 -----
 
