@@ -11,18 +11,18 @@ This is an elaborated [GNU Bash](https://www.gnu.org/software/bash/)
 run-command script which enhances interactive shell sessions with the following features,
 all based on the excellent [FZF](https://github.com/junegunn/fzf/) searching utility:
 
-- improved command history searching with overwritten FZF-based `CTRL+r` functionality,
+- **improved command history searching** with overwritten FZF-based `CTRL+r` functionality,
   based on the built-in `history` command and its underlying `$HOME/.bash_history` file.
 
-- additional command bookmarking with new FZF-based `CTRL+b` (bookmark) functionality,
+- **additional command bookmarking** with new FZF-based `CTRL+b` (bookmark) functionality,
   based on a new `bookmark` command and its underlying `.bash_bookmark` files in current,
   parent and `$HOME` directories.
 
-- additional directory changing with new FZF-based `CTRL+g` (goto) functionality,
+- **additional directory changing** with new FZF-based `CTRL+g` (goto) functionality,
   based on a new `cdpaths` command and its underlying `.bash_cdpaths` files in current,
   parent and `$HOME` directories.
 
-- improved directory changing with an overwritten `cd` command, using the
+- **improved directory changing** with an overwritten `cd` command, using the
   built-in `pushd` functionality and its forward directory stack plus
   additional `cd -` (go backward in directory stack) and `cd +` (go
   forward in directory stack) commands and its underlying additional
