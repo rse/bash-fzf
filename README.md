@@ -1,7 +1,11 @@
 
-# bash-fzf
+bash-fzf
+========
 
 ### Enhance GNU Bash with FZF Matching
+
+About
+-----
 
 This is an elaborated [GNU Bash](https://www.gnu.org/software/bash/)
 run-command script which enhances interactive shell sessions with the following features,
@@ -43,7 +47,7 @@ released as Open Source.
 License
 -------
 
-Copyright (c) 1997-2017 Ralf S. Engelschall (http://engelschall.com/)
+Copyright (c) 1997-2018 Ralf S. Engelschall (http://engelschall.com/)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
