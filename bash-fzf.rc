@@ -251,6 +251,8 @@ if [[ $- =~ .*i.* ]]; then
 
     #   enhance change directory command
     cd () {
+        local result=0
+
         #   change current working directory
         if [[ $1 == "-" ]]; then
             #   go to previous working directory on forward directory stack
@@ -258,9 +260,10 @@ if [[ $- =~ .*i.* ]]; then
             if [[ ${#DIRSTACK[*]} -gt 1 ]]; then
                 DIRSTACKREV[${#DIRSTACKREV[*]}]="${DIRSTACK[0]}"
                 builtin popd >/dev/null
+                result="$?"
             else
                 echo "-bash: cd: ERROR: no more previous working directories on forward directory stack" 1>&2
-                return 1
+                result=1
             fi
         elif [[ $1 == "+" ]]; then
             #   go to previous working directory on reverse directory stack
@@ -268,10 +271,11 @@ if [[ $- =~ .*i.* ]]; then
             if [[ ${#DIRSTACKREV[*]} -gt 0 ]]; then
                 local i=$((${#DIRSTACKREV[*]} - 1))
                 eval "builtin pushd ${DIRSTACKREV[$i]} >/dev/null"
+                result="$?"
                 unset DIRSTACKREV[$i]
             else
                 echo "-bash: cd: ERROR: no more previous working directories on reverse directory stack" 1>&2
-                return 1
+                result=1
             fi
         else
             #   support a quick "go to home directory" use case
@@ -283,20 +287,27 @@ if [[ $- =~ .*i.* ]]; then
             #   (which implicitly pushed it onto the forward directory stack)
             pushd ${1+"$@"} >/dev/null 2>/dev/null
             result="$?"
-            if [[ $result -ne 0 ]]; then
-                echo "-bash: cd: ERROR: $*: No such directory" 1>&2
-            else
+            if [[ $result -eq 0 ]]; then
                 #   avoid duplicates on forward directory stack
-                if [[ "${#DIRSTACK[*]}" -ge 2 && "${DIRSTACK[0]}" = "${DIRSTACK[1]}" ]]; then
+                if [[ "${#DIRSTACK[*]}" -ge 2 && "${DIRSTACK[0]}" == "${DIRSTACK[1]}" ]]; then
                     builtin popd -n >/dev/null
                 fi
 
                 #   erase reverse directory stack
                 DIRSTACKREV=()
+            else
+                echo "-bash: cd: ERROR: $*: No such directory" 1>&2
             fi
-            return $result
         fi
-    }
 
+        #   allow external hooks to execute after we successfully switched the directory
+        if [[ $result -eq 0 ]]; then
+            for hook in "${__fzf_cd_hooks[@]}"; do
+                eval "${hook}"
+            done
+        fi
+
+        return $result
+    }
 fi
 
