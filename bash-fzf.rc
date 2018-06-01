@@ -28,6 +28,9 @@ if [[ $- =~ .*i.* ]]; then
     #   ==== COMMON ====
     #
 
+    #   identification
+    __fzf_version="2.0.5"
+
     #   common fzf(1) processing prolog
     __fzf_prolog () {
         echo -n -e "\e[1A"
@@ -248,6 +251,9 @@ if [[ $- =~ .*i.* ]]; then
 
     #   declare reverse DIRSTACK array
     declare -a DIRSTACKREV=()
+
+    #   declare cd(1) hooks
+    declare -a __fzf_cd_hooks=()
 
     #   enhance change directory command
     cd () {
