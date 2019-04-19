@@ -29,12 +29,19 @@ if [[ $- =~ .*i.* ]]; then
     #
 
     #   identification
-    __fzf_version="2.0.5"
+    __fzf_version="2.0.6"
 
     #   common fzf(1) processing prolog
     __fzf_prolog () {
         echo -n -e "\e[1A"
     }
+
+    #   determine color support
+    __fzf_fzf_options="--color=bw"
+    __fzf_term_colors=$(tput colors 2>/dev/null)
+    if [[ -n $__fzf_term_colors && $__fzf_term_colors -ge 8 ]]; then
+        __fzf_fzf_options="--color=light,bg:-1,fg:-1,hl:1,bg+:0,fg+:15,hl+:1,gutter:-1,pointer:1,info:4,prompt:-1"
+    fi
 
     #   common fzf(1) execution
     __fzf_fzf () {
@@ -43,11 +50,11 @@ if [[ $- =~ .*i.* ]]; then
             --no-mouse \
             --reverse \
             --height=5 \
-            --color=bw \
             --no-bold \
             --inline-info \
             --bind="ctrl-k:kill-line" \
             --expect=ctrl-e \
+            $__fzf_fzf_options \
             "$@"
     }
 
