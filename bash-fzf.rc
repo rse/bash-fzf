@@ -262,33 +262,63 @@ if [[ $- =~ .*i.* ]]; then
 
     #   provide command for scanning directory trees
     cdpaths () {
-        local mode="global"
-        if [[ $1 == "-l" ]]; then
-            mode="local"
-            shift
+        #   the files to operate on
+        local files=$(__fzf_config_files $__fzf_chdir_file)
+        local file=""
+
+        #   command-line argument parsing
+        local usage="cdpaths [-h|--help] [-g|--global] [-l|--local] [-d|--dir <dir>]"
+        local mode="parent"
+        local cmd="none"
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -g|--global ) mode="global"; shift ;;
+                -l|--local  ) mode="local";  shift ;;
+                -d|--dir    ) mode="direct"; file="$2/$__fzf_chdir_file"; shift; shift ;;
+                -h|--help   ) cmd="help";    shift ;;
+                * ) break ;;
+            esac
+        done
+        if [[ $cmd == "help" ]]; then
+            echo "bash: bookmark: USAGE: $usage"
+            return 0
         fi
+
+        #   determine particular cdpaths file
+        if [[ $mode == "global" ]]; then
+            file="$HOME/$__fzf_chdir_file"
+        elif [[ $mode == "local" ]]; then
+            file="$PWD/$__fzf_chdir_file"
+        elif [[ $mode == "parent" ]]; then
+            file=$(echo "$files" | LC_ALL=C sed -e 's; .*;;')
+            if [[ $file == "" ]]; then
+                file="$HOME/$__fzf_chdir_file"
+            fi
+        fi
+
+        #   determine paths to ignore
         local ignore="${BASH_CDPATHS_IGNORE:-'/\\.'}"
-        if [[ $mode == "local" ]]; then
-            rm -f "$PWD/$__fzf_chdir_file"
-            find "$PWD" -type d -print 2>/dev/null | \
-                LC_ALL=C egrep -v "$ignore" | \
-                LC_ALL=C sed -e "s;^$PWD/*;;" -e '/^$/d' >"$PWD/$__fzf_chdir_file"
-            n=$(wc -l "$PWD/.bash_cdpaths" | awk '{ print $1; }')
-            echo "cached $n directory entries in $PWD/$__fzf_chdir_file"
-        else
-            rm -f "$HOME/$__fzf_chdir_file"
+
+        #   find and store directories
+        rm -f "$file"
+        if [[ $mode == "global" ]]; then
             local cdpath="${BASH_CDPATHS:-$HOME}"
             OIFS="$IFS"; IFS=":"
             for dir in $cdpath; do
                 IFS="$OIFS"
                 find "$dir" -type d -print 2>/dev/null | \
                     LC_ALL=C egrep -v "$ignore" | \
-                    LC_ALL=C sed -e "s;^$HOME/*;;" -e '/^$/d' >>"$HOME/$__fzf_chdir_file"
+                    LC_ALL=C sed -e "s;^$dir/*;;" -e '/^$/d' >>"$file"
             done
             IFS="$OIFS"
-            n=$(wc -l "$HOME/$__fzf_chdir_file" | awk '{ print $1; }')
-            echo "(cached $n directory entries in $HOME/$__fzf_chdir_file)"
+        else
+            dir=$(dirname "$file")
+            find "$dir" -type d -print 2>/dev/null | \
+                LC_ALL=C egrep -v "$ignore" | \
+                LC_ALL=C sed -e "s;^$dir/*;;" -e '/^$/d' >"$file"
         fi
+        n=$(wc -l "$file" | awk '{ print $1; }')
+        echo "bash: cdpaths: cached $n directory entries in $file"
     }
 
     #   expand .bash_cdpaths files content
