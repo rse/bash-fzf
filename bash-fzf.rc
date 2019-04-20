@@ -156,30 +156,93 @@ if [[ $- =~ .*i.* ]]; then
     #   provide additional Bash bookmarking functionality (CTRL+b)
     bind '"\C-b": "\C-a\C-k __fzf_bookmark\C-j"'
 
-    #   provide convenient command for bookmarking last command
-    #   and editing all previously bookmarked commands
+    #   provide convenient command for editing bookmarked commands
     bookmark () {
-        local mode="global"
-        if [[ $1 == "-l" ]]; then
-            mode="local"
-            shift
+        #   the files to operate on
+        local files=$(__fzf_config_files $__fzf_bookmark_file)
+        local file=""
+
+        #   command-line argument parsing
+        local usage="bookmark [-h|--help] [-g|--global] [-l|--local] [-d|--dir <dir>] [-s|--show] [-e|--edit] [-x|--exec] [-a|--add] [-r|--remove] [<cmd>]"
+        local mode="parent"
+        local cmd="none"
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -g|--global ) mode="global"; shift ;;
+                -l|--local  ) mode="local";  shift ;;
+                -d|--dir    ) mode="direct"; file="$2/$__fzf_bookmark_file"; shift; shift ;;
+                -s|--show   ) cmd="show";    shift ;;
+                -e|--edit   ) cmd="edit";    shift ;;
+                -x|--exec   ) cmd="exec";    shift ;;
+                -a|--add    ) cmd="add";     shift ;;
+                -r|--remove ) cmd="remove";  shift ;;
+                -h|--help   ) cmd="help";    shift ;;
+                * ) break ;;
+            esac
+        done
+        if [[ $cmd == "none" ]]; then
+            echo "-bash: bookmark: ERROR: invalid number of arguments" 2>&1
+            echo "-bash: bookmark: USAGE: $usage" 2>&1
+            return 1
         fi
-        if [[ $mode == "local" ]]; then
+        if [[ $cmd == "help" ]]; then
+            echo "bash: bookmark: USAGE: $usage"
+            return 0
+        fi
+
+        #   determine particular bookmark file
+        if [[ $mode == "global" ]]; then
+            file="$HOME/$__fzf_bookmark_file"
+        elif [[ $mode == "local" ]]; then
             file="$PWD/$__fzf_bookmark_file"
-        else
-            local file=$(__fzf_config_files $__fzf_bookmark_file | sed -e 's; .*;;')
+        elif [[ $mode == "parent" ]]; then
+            file=$(echo "$files" | LC_ALL=C sed -e 's; .*;;')
             if [[ $file == "" ]]; then
                 file="$HOME/$__fzf_bookmark_file"
             fi
         fi
-        if [[ $1 == "-e" ]]; then
+
+        #   perform the commands
+        if [[ $cmd == "show" ]]; then
+            #   show bookmarked commands (in all files)
+            if [[ $files != "" ]]; then
+                for file in $files; do
+                    LC_ALL=C sed -e '/^ *#.*/d' -e '/^ *$/d' -e "s;^;$file: ;" <$file
+                done
+            fi
+            return 0
+        elif [[ $cmd == "edit" ]]; then
+            #   edit bookmarked commands (in particular file)
+            echo "bash: bookmark: editing commands in \"$file\""
             ${EDITOR-vi} $file
-        elif [[ $1 == "-a" ]]; then
-            fc -l -n -1 | sed -e 's;^[	 ]*;;' >>$file
-        else
-            echo "-bash: bookmark: ERROR: invalid argument" 2>&1
-            echo "-bash: bookmark: USAGE: bookmark [-l] -a|-e" 2>&1
-            return 1
+            return $?
+        elif [[ $cmd == "add" ]]; then
+            #   add bookmarked command (to particular file)
+            if [[ $# -gt 0 ]]; then
+                entry="$*"
+            else
+                entry=$(fc -l -n -1 | LC_ALL=C sed -e 's;^[	 ]*;;')
+            fi
+            echo "bash: bookmark: adding command to \"$file\": $entry"
+            echo "$entry" >>$file
+            return 0
+        elif [[ $cmd == "remove" ]]; then
+            #   remove bookmarked command (from particular file)
+            if [[ $# -gt 0 ]]; then
+                entry="$*"
+            else
+                entry=$(fc -l -n -1 | LC_ALL=C sed -e 's;^[	 ]*;;')
+            fi
+            echo "bash: bookmark: removing command from \"$file\": $entry"
+            LC_ALL=C sed -e "/^$*/d" <$file >$file.new
+            if cmp $file $file.new >/dev/null 2>&1; then
+                rm -f $file.new
+                echo "-bash: bookmark: ERROR: failed to remove command" 2>&1
+                return 1
+            fi
+            cp $file.new $file
+            rm -f $file.new
+            return 0
         fi
     }
 
