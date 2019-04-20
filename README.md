@@ -30,6 +30,34 @@ all based on the excellent [FZF](https://github.com/junegunn/fzf/) searching uti
   and the additional `cd +` (go forward in directory stack) commands and
   its underlying custom reverse directory stack.
 
+FZF Cheatsheet
+--------------
+
+In all FZF sessions, the following inputs are available:
+
+- Searching: enter one or more words for searching through the list of
+  shell commands. The words are AND-combined, i.e., all the words have to
+  match. In case a word begins with `!`, it is negated, i.e., it has to
+  NOT match.
+
+- Editing: press `LEFT`/`RIGHT` for positioning the cursor on the line,
+  press `CTRL+a` for jumping to the beginning of the line,
+  press `CTRL+w` for deleting the word before the current cursor position,
+  press `CTRL+k` for deleting everthing after the current cursor position.
+
+- Selection: press `UP`/`DOWN` to select a command.
+
+- Execution: press `RETURN` for terminating the FZF session and executing the selected command.
+
+- Editing: press `CTRL+e` for termining the FZF session and picking up the selected command
+  for subsequent editing on the shell prompt,
+
+- Termination: press `CTRL+c`/`CTRL-g`/`ESC` for terminating the FZF session
+  without executing any command at all.
+
+For more details on the usage of the underlying FZF, please see
+the [FZF documentation](https://github.com/junegunn/fzf/).
+
 Usage
 -----
 
