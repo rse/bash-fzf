@@ -60,8 +60,8 @@ if [[ $- =~ .*i.* ]]; then
 
     #   common fzf(1) processing epilog
     __fzf_epilog () {
-        key=$(echo "$1" | sed -e 1q)
-        cmd=$(echo "$1" | sed -e 1d)
+        key=$(echo "$1" | LC_ALL=C sed -e 1q)
+        cmd=$(echo "$1" | LC_ALL=C sed -e 1d)
         if [[ $key == "" && $cmd == "" ]]; then
             echo -n -e "\e[1A"
             history -s
@@ -237,7 +237,7 @@ if [[ $- =~ .*i.* ]]; then
                 cdpathdir="~"
             fi
             echo "cd $cdpathdir"
-            cat $cdpathfile | sed -e "s;^\\([^/]\\);$cdpathdir/\\1;" -e "s;^;cd ;"
+            cat $cdpathfile | LC_ALL=C sed -e "s;^\\([^/]\\);$cdpathdir/\\1;" -e "s;^;cd ;"
         done
     }
 
