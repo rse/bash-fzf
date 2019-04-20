@@ -14,21 +14,21 @@ run-command script which enhances interactive shell sessions with the following 
 all based on the excellent [FZF](https://github.com/junegunn/fzf/) searching utility:
 
 - **improved command history searching** with overwritten FZF-based `CTRL+r` functionality,
-  based on the built-in `history` command and its underlying `$HOME/.bash_history` file.
+  based on the built-in `history` command and its underlying standard `$HOME/.bash_history` file.
 
 - **additional command bookmarking** with new FZF-based `CTRL+b` (bookmark) functionality,
-  based on a new `bookmark` command and its underlying `.bash_bookmark` files in current,
-  parent and `$HOME` directories.
+  based on a new `bookmark` command and its underlying custom
+  `.bash_bookmark` files in current, parent and `$HOME` directories.
 
 - **additional directory changing** with new FZF-based `CTRL+g` (goto) functionality,
-  based on a new `cdpaths` command and its underlying `.bash_cdpaths` files in current,
-  parent and `$HOME` directories.
+  based on a new `cdpaths` command and its underlying custom
+  `.bash_cdpaths` files in current, parent and `$HOME` directories.
 
-- **improved directory changing** with an overwritten `cd` command, using the
-  built-in `pushd` functionality and its forward directory stack plus
-  additional `cd -` (go backward in directory stack) and `cd +` (go
-  forward in directory stack) commands and its underlying additional
-  reverse directory stack.
+- **improved directory changing** with an overwritten `cd` command, using
+  the built-in `pushd` functionality and its built-in forward directory
+  stack, plus the additional `cd -` (go backward in directory stack),
+  and the additional `cd +` (go forward in directory stack) commands and
+  its underlying custom reverse directory stack.
 
 Usage
 -----
@@ -37,14 +37,24 @@ Usage
 source bash-fzf.rc
 ```
 
+Hint
+----
+
+In practice, this optimally should be combined with
+my [Unix dotfiles](https://github.com/rse/dotfiles)
+project which provides a reasonable GNU Bash shell
+environment. It automatically enables *bash-fzf* if you copy the
+[bash-fzf.rc](https://github.com/rse/bash-fzf/blob/master/bash-fzf.rc)
+script to `~/.bash-fzf.rc`.
+
 History
 -------
 
-The functionality was invented in 1997 and was originally based on
-iselect(1), an interactive selection tool by the author, a little
-bit similar to FZF but without the search functionality. In 2017 the
-functionality was migrated to the excellent FZF utility and the result
-released as Open Source.
+The functionality was orginally invented in 1997 and was originally
+based on iselect(1), an interactive selection tool by the author, a
+little bit similar to FZF but without the search functionality. In 2017
+the functionality was migrated to the excellent FZF utility and the
+result released as Open Source.
 
 License
 -------
