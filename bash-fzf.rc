@@ -280,7 +280,7 @@ if [[ $- =~ .*i.* ]]; then
             esac
         done
         if [[ $cmd == "help" ]]; then
-            echo "bash: bookmark: USAGE: $usage"
+            echo "bash: cdpaths: USAGE: $usage"
             return 0
         fi
 
