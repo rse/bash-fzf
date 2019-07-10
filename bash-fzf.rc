@@ -301,23 +301,25 @@ if [[ $- =~ .*i.* ]]; then
 
         #   find and store directories
         rm -f "$file"
+        local dir=$(dirname "$file")
         if [[ $mode == "global" ]]; then
-            local cdpath="${BASH_CDPATHS:-$HOME}"
-            OIFS="$IFS"; IFS=":"
-            for dir in $cdpath; do
+            #   crawl all global directories
+            local cdpaths="${BASH_CDPATHS:-$HOME}"
+            local OIFS="$IFS"; IFS=":"
+            for cdpath in $cdpaths; do
                 IFS="$OIFS"
-                find "$dir" -type d -print 2>/dev/null | \
+                find "$cdpath" -type d -print 2>/dev/null | \
                     LC_ALL=C egrep -v "$ignore" | \
                     LC_ALL=C sed -e "s;^$dir/*;;" -e '/^$/d' >>"$file"
             done
             IFS="$OIFS"
         else
-            dir=$(dirname "$file")
+            #   crawl relative directory
             find "$dir" -type d -print 2>/dev/null | \
                 LC_ALL=C egrep -v "$ignore" | \
                 LC_ALL=C sed -e "s;^$dir/*;;" -e '/^$/d' >"$file"
         fi
-        n=$(wc -l "$file" | awk '{ print $1; }')
+        local n=$(wc -l "$file" | awk '{ print $1; }')
         echo "bash: cdpaths: cached $n directory entries in $file"
     }
 
