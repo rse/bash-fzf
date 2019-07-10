@@ -297,7 +297,7 @@ if [[ $- =~ .*i.* ]]; then
         fi
 
         #   determine paths to ignore
-        local ignore="${BASH_CDPATHS_IGNORE:-'/\\.'}"
+        local ignore=${BASH_CDPATHS_IGNORE:-'/\.'}
 
         #   find and store directories
         rm -f "$file"
