@@ -29,7 +29,7 @@ if [[ $- =~ .*i.* ]]; then
     #
 
     #   identification
-    __fzf_version="2.0.7"
+    __fzf_version="2.1.2"
 
     #   common fzf(1) processing prolog
     __fzf_prolog () {
