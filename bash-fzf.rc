@@ -53,6 +53,7 @@ if [[ $- =~ .*i.* ]]; then
             --no-bold \
             --inline-info \
             --bind="ctrl-k:kill-line" \
+            --bind="backward-eof:abort" \
             --expect=ctrl-e \
             $__fzf_fzf_options \
             "$@"
