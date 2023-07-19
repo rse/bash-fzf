@@ -128,7 +128,7 @@ if [[ $- =~ .*i.* ]]; then
     __fzf_history () {
         __fzf_prolog
         history -a
-        local cmd=$(history | LC_ALL=C sort -rn | LC_ALL=C sed -e 1d | LC_ALL=C cut -c29- | __fzf_fzf --prompt="\$ ")
+        local cmd=$(history | LC_ALL=C sort -rn | LC_ALL=C cut -c29- | __fzf_fzf --prompt="\$ ")
         __fzf_epilog "$cmd"
     }
 
